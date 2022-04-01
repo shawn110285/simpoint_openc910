@@ -27,7 +27,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-`timescale 1ns/100ps
+//`timescale 1ns/100ps
 
 `define CLK_PERIOD          10
 `define TCLK_PERIOD         40
@@ -63,14 +63,14 @@ module top(
   wire jtg_tdi;
   wire jtg_tdo;
   wire  pad_yy_gate_clk_en_b;
-  
+
   static integer FILE;
-  
+
   wire uart0_sin;
   wire [7:0]b_pad_gpio_porta;
-  
+
   assign pad_yy_gate_clk_en_b = 1'b1;
-  
+
   //initial
   //begin
   //  clk =0;
@@ -78,12 +78,12 @@ module top(
   //    #(`CLK_PERIOD/2) clk = ~clk;
   //  end
   //end
-  
+
 
 
   integer jclkCnt;
-  initial 
-  begin 
+  initial
+  begin
     jclk = 0;
     jclkCnt = 0;
     //forever begin
@@ -99,7 +99,7 @@ module top(
       jclk = !jclk;
     end
   end
-  
+
   integer rst_bCnt;
   initial
   begin
@@ -116,7 +116,7 @@ module top(
     if(rst_bCnt > 10 && rst_bCnt < 20) rst_b = 0;
     else if(rst_bCnt > 20) rst_b = 1;
   end
-  
+
   integer jrstCnt;
   initial
   begin
@@ -132,13 +132,14 @@ module top(
     if(jrstCnt > 40 && jrstCnt < 80) jrst_b = 0;
     else if(jrstCnt > 80) jrst_b = 1;
   end
- 
+
   integer i;
   bit [31:0] mem_inst_temp [65536];
   bit [31:0] mem_data_temp [65536];
   integer j;
   initial
   begin
+
     $display("\t********* Init Program *********");
     $display("\t********* Wipe memory to 0 *********");
     for(i=0; i < 32'h16384; i=i+1)
@@ -160,11 +161,11 @@ module top(
       `RTL_MEM.ram14.mem[i][7:0] = 8'h0;
       `RTL_MEM.ram15.mem[i][7:0] = 8'h0;
     end
-  
+
     $display("\t********* Read program *********");
     $readmemh("inst.pat", mem_inst_temp);
     $readmemh("data.pat", mem_data_temp);
-  
+
     $display("\t********* Load program to memory *********");
     i=0;
     for(j=0;i<32'h4000;i=j/4)
@@ -224,7 +225,7 @@ module top(
       $display("*   meeting max simulation time, stop!       *");
       $display("**********************************************");
       FILE = $fopen("run_case.report","w");
-      $fwrite(FILE,"TEST FAIL");   
+      $fwrite(FILE,"TEST FAIL");
       $finish;
     end
   end
@@ -236,23 +237,23 @@ module top(
   //  $display("*   meeting max simulation time, stop!       *");
   //  $display("**********************************************");
   //  FILE = $fopen("run_case.report","w");
-  //  $fwrite(FILE,"TEST FAIL");   
+  //  $fwrite(FILE,"TEST FAIL");
   //$finish;
   end
-  
+
   reg [31:0] retire_inst_in_period;
   reg [31:0] cycle_count;
-  
+
   `define LAST_CYCLE 50000
   always @(posedge clk or negedge rst_b)
   begin
     if(!rst_b)
       cycle_count[31:0] <= 32'b1;
-    else 
+    else
       cycle_count[31:0] <= cycle_count[31:0] + 1'b1;
   end
-  
-  
+
+
   always @(posedge clk or negedge rst_b)
   begin
     if(!rst_b) //reset to zero
@@ -266,8 +267,8 @@ module top(
         $display("*************************************************************");
         //#10;
         FILE = $fopen("run_case.report","w");
-        $fwrite(FILE,"TEST FAIL");   
-  
+        $fwrite(FILE,"TEST FAIL");
+
         $finish;
       end
       retire_inst_in_period[31:0] <= 32'b0;
@@ -275,9 +276,9 @@ module top(
     else if(`tb_retire0 || `tb_retire1 || `tb_retire2)
       retire_inst_in_period[31:0] <= retire_inst_in_period[31:0] + 1'b1;
   end
-  
-  
-  
+
+
+
   reg [31:0] cpu_awaddr;
   reg [3:0]  cpu_awlen;
   reg [15:0] cpu_wstrb;
@@ -285,8 +286,8 @@ module top(
   reg [63:0] value0;
   reg [63:0] value1;
   reg [63:0] value2;
-  
-  
+
+
   always @(posedge clk)
   begin
     cpu_awlen[3:0]   <= `SOC_TOP.x_axi_slave128.awlen[3:0];
@@ -300,7 +301,7 @@ module top(
     value1              <= `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.rbus_pipe1_wb_data[63:0];
     value2              <= `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.ld_wb_preg_data_sign_extend[63:0];
   end
-  
+
   always @(posedge clk)
   begin
       if(value0 == 64'h444333222 || value1 == 64'h444333222 || value2 == 64'h444333222)
@@ -310,8 +311,8 @@ module top(
       $display("**********************************************");
      //#10;
      FILE = $fopen("run_case.report","w");
-     $fwrite(FILE,"TEST PASS");   
-  
+     $fwrite(FILE,"TEST PASS");
+
      $finish;
     end
       else if (value0 == 64'h2382348720 || value1 == 64'h2382348720 || value2 == 64'h444333222)
@@ -321,11 +322,11 @@ module top(
      $display("**********************************************");
      //#10;
      FILE = $fopen("run_case.report","w");
-     $fwrite(FILE,"TEST FAIL");   
-  
+     $fwrite(FILE,"TEST FAIL");
+
      $finish;
     end
-  
+
     else if((cpu_awlen[3:0] == 4'b0) &&
   //     (cpu_awaddr[31:0] == 32'h6000fff8) &&
   //     (cpu_awaddr[31:0] == 32'h0003fff8) &&
@@ -350,34 +351,34 @@ module top(
         $write("%c", `SOC_TOP.biu_pad_wdata[103:96]);
      end
     end
-  
+
   end
-  
-  
-  
+
+
+
   parameter cpu_cycle = 110;
   `ifndef NO_DUMP
   initial
   begin
   `ifdef NC_SIM
     $dumpfile("test.vcd");
-    $dumpvars;  
+    $dumpvars;
   `else
     `ifdef IVERILOG_SIM
       $dumpfile("test.vcd");
-      $dumpvars;  
+      $dumpvars;
     `else
       $dumpfile("test.vcd");
-      $dumpvars;  
+      $dumpvars;
     `endif
   `endif
   end
   `endif
-  
+
   assign jtg_tdi = 1'b0;
   assign uart0_sin = 1'b1;
-  
-  
+
+
   soc x_soc(
     .i_pad_clk           ( clk                  ),
     .b_pad_gpio_porta    ( b_pad_gpio_porta     ),
@@ -390,10 +391,10 @@ module top(
     .o_pad_uart0_sout    ( uart0_sout           ),
     .i_pad_rst_b         ( rst_b                )
   );
-  
+
   int_mnt x_int_mnt(
   );
-  
+
   // debug_stim x_debug_stim(
   // );
 
@@ -407,7 +408,7 @@ module top(
      	supply_on ("VDDG", 1.00);
   end
 
-  initial 
+  initial
   begin
     $deposit(top.x_soc.pmu_cpu_pwr_on,  1'b1);
     $deposit(top.x_soc.pmu_cpu_iso_in,  1'b0);
@@ -416,9 +417,9 @@ module top(
     $deposit(top.x_soc.pmu_cpu_restore, 1'b0);
   end
 `endif
-  
+
   reg [31:0] virtual_counter;
-  
+
   always @(posedge `CPU_CLK or negedge `CPU_RST)
   begin
     if(!`CPU_RST)
@@ -427,11 +428,11 @@ module top(
       virtual_counter[31:0] <= virtual_counter[31:0];
     else
       virtual_counter[31:0] <= virtual_counter[31:0] +1'b1;
-  end 
-  
+  end
+
   //always @(*)
   //begin
   //if(virtual_counter[31:0]> 32'h3000000) $finish;
   //end
-  
+
 endmodule

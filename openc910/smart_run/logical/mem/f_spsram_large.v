@@ -307,7 +307,7 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
   .PortADataOut(ram15_dout));
 
 
-    // Task for loading 'ram_mem' with SystemVerilog system task $readmemh()
+    // Task for loading 'mem' with SystemVerilog system task $readmemh()
     export "DPI-C" task simutil_large_spsram_load;
 
     task simutil_large_spsram_load;
@@ -326,56 +326,56 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
         $display("\t*********spram:Load instruction segment (%s) into memory *********", file1);
         j=0;
         for(i=0;i<32'h4000;i=j/4) begin
-            ram0.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
-            ram1.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
-            ram2.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
-            ram3.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            ram0.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram1.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram2.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram3.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
             j = j+1;
-            ram4.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
-            ram5.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
-            ram6.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
-            ram7.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            ram4.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram5.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram6.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram7.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
             j = j+1;
-            ram8.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
-            ram9.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
-            ram10.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
-            ram11.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            ram8.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram9.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram10.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram11.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
             j = j+1;
-            ram12.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
-            ram13.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
-            ram14.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
-            ram15.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            ram12.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram13.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram14.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram15.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
             j = j+1;
         end
 
         $display("\t*********spram:Load data segment (%s) into memory *********", file2);
         j=0;
         for(i=0;i<32'h4000;i=j/4) begin
-            ram0.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
-            ram1.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
-            ram2.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
-            ram3.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            ram0.mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram1.mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram2.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram3.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
             j = j+1;
-            ram4.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
-            ram5.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
-            ram6.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
-            ram7.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            ram4.mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram5.mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram6.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram7.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
             j = j+1;
-            ram8.ram_mem[i+32'h4000][7:0]   = mem_data_temp[j][31:24];
-            ram9.ram_mem[i+32'h4000][7:0]   = mem_data_temp[j][23:16];
-            ram10.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
-            ram11.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            ram8.mem[i+32'h4000][7:0]   = mem_data_temp[j][31:24];
+            ram9.mem[i+32'h4000][7:0]   = mem_data_temp[j][23:16];
+            ram10.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram11.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
             j = j+1;
-            ram12.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
-            ram13.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
-            ram14.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
-            ram15.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            ram12.mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram13.mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram14.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram15.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
             j = j+1;
         end
 
     endtask
 
-    // Function for setting a specific element in |ram_mem|
+    // Function for setting a specific element in |mem|
     // Returns 1 (true) for success, 0 (false) for errors.
     export "DPI-C" function simutil_large_spsram_set;
 
@@ -387,67 +387,67 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
 
         case (mem_index)
             0: begin
-                ram0.ram_mem[addr_index][7:0] = val;
+                ram0.mem[addr_index][7:0] = val;
             end
 
             1: begin
-                ram1.ram_mem[addr_index][7:0] = val;
+                ram1.mem[addr_index][7:0] = val;
             end
 
             2: begin
-                ram2.ram_mem[addr_index][7:0] = val;
+                ram2.mem[addr_index][7:0] = val;
             end
 
             3: begin
-                ram3.ram_mem[addr_index][7:0] = val;
+                ram3.mem[addr_index][7:0] = val;
             end
 
             4: begin
-                ram4.ram_mem[addr_index][7:0] = val;
+                ram4.mem[addr_index][7:0] = val;
             end
 
             5: begin
-                ram5.ram_mem[addr_index][7:0] = val;
+                ram5.mem[addr_index][7:0] = val;
             end
 
             6: begin
-                ram6.ram_mem[addr_index][7:0] = val;
+                ram6.mem[addr_index][7:0] = val;
             end
 
             7: begin
-                ram7.ram_mem[addr_index][7:0] = val;
+                ram7.mem[addr_index][7:0] = val;
             end
 
             8: begin
-                ram8.ram_mem[addr_index][7:0] = val;
+                ram8.mem[addr_index][7:0] = val;
             end
 
             9: begin
-                ram9.ram_mem[addr_index][7:0] = val;
+                ram9.mem[addr_index][7:0] = val;
             end
 
             10: begin
-                ram10.ram_mem[addr_index][7:0] = val;
+                ram10.mem[addr_index][7:0] = val;
             end
 
             11: begin
-                ram11.ram_mem[addr_index][7:0] = val;
+                ram11.mem[addr_index][7:0] = val;
             end
 
             12: begin
-                ram12.ram_mem[addr_index][7:0] = val;
+                ram12.mem[addr_index][7:0] = val;
             end
 
             13: begin
-                ram13.ram_mem[addr_index][7:0] = val;
+                ram13.mem[addr_index][7:0] = val;
             end
 
             14: begin
-                ram14.ram_mem[addr_index][7:0] = val;
+                ram14.mem[addr_index][7:0] = val;
             end
 
             15: begin
-                ram15.ram_mem[addr_index][7:0] = val;
+                ram15.mem[addr_index][7:0] = val;
             end
 
             default: begin
@@ -459,7 +459,7 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
 
 
 
-    // Function for getting a specific element in |ram_mem|
+    // Function for getting a specific element in |mem|
     export "DPI-C" function simutil_large_spsram_get;
 
     function int simutil_large_spsram_get(input mem_index, input int addr_index, output bit [7:0] val);
@@ -470,67 +470,67 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
 
         case (mem_index)
             0: begin
-                val = ram0.ram_mem[addr_index][7:0];
+                val = ram0.mem[addr_index][7:0];
             end
 
             1: begin
-                val = ram1.ram_mem[addr_index][7:0];
+                val = ram1.mem[addr_index][7:0];
             end
 
             2: begin
-                val = ram2.ram_mem[addr_index][7:0];
+                val = ram2.mem[addr_index][7:0];
             end
 
             3: begin
-                val = ram3.ram_mem[addr_index][7:0];
+                val = ram3.mem[addr_index][7:0];
             end
 
             4: begin
-                val = ram4.ram_mem[addr_index][7:0];
+                val = ram4.mem[addr_index][7:0];
             end
 
             5: begin
-                val = ram5.ram_mem[addr_index][7:0];
+                val = ram5.mem[addr_index][7:0];
             end
 
             6: begin
-                val = ram6.ram_mem[addr_index][7:0];
+                val = ram6.mem[addr_index][7:0];
             end
 
             7: begin
-                val = ram7.ram_mem[addr_index][7:0];
+                val = ram7.mem[addr_index][7:0];
             end
 
             8: begin
-                val = ram8.ram_mem[addr_index][7:0];
+                val = ram8.mem[addr_index][7:0];
             end
 
             9: begin
-                val = ram9.ram_mem[addr_index][7:0];
+                val = ram9.mem[addr_index][7:0];
             end
 
             10: begin
-                val = ram10.ram_mem[addr_index][7:0];
+                val = ram10.mem[addr_index][7:0];
             end
 
             11: begin
-                val = ram11.ram_mem[addr_index][7:0];
+                val = ram11.mem[addr_index][7:0];
             end
 
             12: begin
-                val = ram12.ram_mem[addr_index][7:0];
+                val = ram12.mem[addr_index][7:0];
             end
 
             13: begin
-                val = ram13.ram_mem[addr_index][7:0];
+                val = ram13.mem[addr_index][7:0];
             end
 
             14: begin
-                val = ram14.ram_mem[addr_index][7:0];
+                val = ram14.mem[addr_index][7:0];
             end
 
             15: begin
-                val = ram15.ram_mem[addr_index][7:0];
+                val = ram15.mem[addr_index][7:0];
             end
 
             default: begin
