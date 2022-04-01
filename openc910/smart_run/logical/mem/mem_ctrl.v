@@ -521,19 +521,21 @@ module mem_ctrl #(parameter MEM_ADDR_WIDTH = 17)
     export "DPI-C" task simutil_ram_ctrl_load;
 
     task simutil_ram_ctrl_load;
-        input string file;
+        input string file1;
+        input string file2;
 
         integer i;
         integer j;
 
         bit [31:0] mem_inst_temp [65536];
+        bit [31:0] mem_data_temp [65536];
 
-        $readmemh(file, mem_inst_temp);
+        $readmemh(file1, mem_inst_temp);
+        $readmemh(file2, mem_data_temp);
 
-        $display("\t********* Load program to memory *********");
-
-        i=0;
-        for(j=0;i<32'h4000;i=j/4) begin
+        $display("\t*********mem_ctrl:Load instruction segment (%s) into memory *********", file1);
+        j=0;
+        for(i=0;i<32'h4000;i=j/4) begin
             ram0.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
             ram1.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
             ram2.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
@@ -553,6 +555,31 @@ module mem_ctrl #(parameter MEM_ADDR_WIDTH = 17)
             ram13.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
             ram14.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
             ram15.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+        end
+
+        $display("\t*********mem_ctrl:Load data segment (%s) into memory *********", file2);
+        j=0;
+        for(i=0;i<32'h4000;i=j/4) begin
+            ram0.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram1.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram2.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram3.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram4.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram5.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram6.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram7.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram8.ram_mem[i+32'h4000][7:0]   = mem_data_temp[j][31:24];
+            ram9.ram_mem[i+32'h4000][7:0]   = mem_data_temp[j][23:16];
+            ram10.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram11.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram12.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram13.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram14.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram15.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
             j = j+1;
         end
 

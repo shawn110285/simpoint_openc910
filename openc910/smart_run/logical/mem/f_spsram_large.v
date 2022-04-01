@@ -47,71 +47,73 @@ module f_spsram_large(
 parameter ADDR_WIDTH = 21;	// 2MB per ram, 16MB at all for f_spsram_large
 parameter WRAP_WIDTH = 8;
 
-input   [ADDR_WIDTH-1:0]  A;           
-input           CEN;         
-input           CLK;         
-input   [127:0] D;           
-input   [15:0]  WEN;         
-output  [127:0] Q;           
+parameter  MEMDEPTH = 2**(ADDR_WIDTH);
 
-reg     [ADDR_WIDTH-1:0]  addr_holding; 
+input   [ADDR_WIDTH-1:0]  A;
+input           CEN;
+input           CLK;
+input   [127:0] D;
+input   [15:0]  WEN;
+output  [127:0] Q;
+
+reg     [ADDR_WIDTH-1:0]  addr_holding;
 
 
-wire    [ADDR_WIDTH-1:0]  A;           
-wire            CEN;         
-wire            CLK;         
-wire    [127:0] D;           
-wire    [127:0] Q;           
-wire    [15:0]  WEN;         
-wire    [ADDR_WIDTH-1:0]  addr;        
-wire    [7 :0]  ram0_din;    
-wire    [7 :0]  ram0_dout;   
-wire            ram0_wen;    
-wire    [7 :0]  ram1_din;    
-wire    [7 :0]  ram1_dout;   
-wire            ram1_wen;    
-wire    [7 :0]  ram2_din;    
-wire    [7 :0]  ram2_dout;   
-wire            ram2_wen;    
-wire    [7 :0]  ram3_din;    
-wire    [7 :0]  ram3_dout;   
-wire            ram3_wen;    
-wire    [7 :0]  ram4_din;    
-wire    [7 :0]  ram4_dout;   
-wire            ram4_wen;    
-wire    [7 :0]  ram5_din;    
-wire    [7 :0]  ram5_dout;   
-wire            ram5_wen;    
-wire    [7 :0]  ram6_din;    
-wire    [7 :0]  ram6_dout;   
-wire            ram6_wen;    
-wire    [7 :0]  ram7_din;    
-wire    [7 :0]  ram7_dout;   
-wire            ram7_wen;    
-wire    [7 :0]  ram8_din;    
-wire    [7 :0]  ram8_dout;   
-wire            ram8_wen;    
-wire    [7 :0]  ram9_din;    
-wire    [7 :0]  ram9_dout;   
-wire            ram9_wen;    
-wire    [7 :0]  ram10_din;    
-wire    [7 :0]  ram10_dout;   
-wire            ram10_wen;    
-wire    [7 :0]  ram11_din;    
-wire    [7 :0]  ram11_dout;   
-wire            ram11_wen;    
-wire    [7 :0]  ram12_din;    
-wire    [7 :0]  ram12_dout;   
-wire            ram12_wen;    
-wire    [7 :0]  ram13_din;    
-wire    [7 :0]  ram13_dout;   
-wire            ram13_wen;    
-wire    [7 :0]  ram14_din;    
-wire    [7 :0]  ram14_dout;   
-wire            ram14_wen;    
-wire    [7 :0]  ram15_din;    
-wire    [7 :0]  ram15_dout;   
-wire            ram15_wen;    
+wire    [ADDR_WIDTH-1:0]  A;
+wire            CEN;
+wire            CLK;
+wire    [127:0] D;
+wire    [127:0] Q;
+wire    [15:0]  WEN;
+wire    [ADDR_WIDTH-1:0]  addr;
+wire    [7 :0]  ram0_din;
+wire    [7 :0]  ram0_dout;
+wire            ram0_wen;
+wire    [7 :0]  ram1_din;
+wire    [7 :0]  ram1_dout;
+wire            ram1_wen;
+wire    [7 :0]  ram2_din;
+wire    [7 :0]  ram2_dout;
+wire            ram2_wen;
+wire    [7 :0]  ram3_din;
+wire    [7 :0]  ram3_dout;
+wire            ram3_wen;
+wire    [7 :0]  ram4_din;
+wire    [7 :0]  ram4_dout;
+wire            ram4_wen;
+wire    [7 :0]  ram5_din;
+wire    [7 :0]  ram5_dout;
+wire            ram5_wen;
+wire    [7 :0]  ram6_din;
+wire    [7 :0]  ram6_dout;
+wire            ram6_wen;
+wire    [7 :0]  ram7_din;
+wire    [7 :0]  ram7_dout;
+wire            ram7_wen;
+wire    [7 :0]  ram8_din;
+wire    [7 :0]  ram8_dout;
+wire            ram8_wen;
+wire    [7 :0]  ram9_din;
+wire    [7 :0]  ram9_dout;
+wire            ram9_wen;
+wire    [7 :0]  ram10_din;
+wire    [7 :0]  ram10_dout;
+wire            ram10_wen;
+wire    [7 :0]  ram11_din;
+wire    [7 :0]  ram11_dout;
+wire            ram11_wen;
+wire    [7 :0]  ram12_din;
+wire    [7 :0]  ram12_dout;
+wire            ram12_wen;
+wire    [7 :0]  ram13_din;
+wire    [7 :0]  ram13_dout;
+wire            ram13_wen;
+wire    [7 :0]  ram14_din;
+wire    [7 :0]  ram14_dout;
+wire            ram14_wen;
+wire    [7 :0]  ram15_din;
+wire    [7 :0]  ram15_dout;
+wire            ram15_wen;
 
 
 
@@ -303,6 +305,241 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
   .PortADataIn (ram15_din),
   .PortAWriteEnable(ram15_wen),
   .PortADataOut(ram15_dout));
+
+
+    // Task for loading 'ram_mem' with SystemVerilog system task $readmemh()
+    export "DPI-C" task simutil_large_spsram_load;
+
+    task simutil_large_spsram_load;
+        input string file1;
+        input string file2;
+
+        integer i;
+        integer j;
+
+        bit [31:0] mem_inst_temp [65536];
+        bit [31:0] mem_data_temp [65536];
+
+        $readmemh(file1, mem_inst_temp);
+        $readmemh(file2, mem_data_temp);
+
+        $display("\t*********spram:Load instruction segment (%s) into memory *********", file1);
+        j=0;
+        for(i=0;i<32'h4000;i=j/4) begin
+            ram0.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram1.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram2.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram3.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+            ram4.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram5.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram6.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram7.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+            ram8.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram9.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram10.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram11.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+            ram12.ram_mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram13.ram_mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram14.ram_mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram15.ram_mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+        end
+
+        $display("\t*********spram:Load data segment (%s) into memory *********", file2);
+        j=0;
+        for(i=0;i<32'h4000;i=j/4) begin
+            ram0.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram1.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram2.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram3.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram4.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram5.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram6.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram7.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram8.ram_mem[i+32'h4000][7:0]   = mem_data_temp[j][31:24];
+            ram9.ram_mem[i+32'h4000][7:0]   = mem_data_temp[j][23:16];
+            ram10.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram11.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram12.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram13.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram14.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram15.ram_mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+        end
+
+    endtask
+
+    // Function for setting a specific element in |ram_mem|
+    // Returns 1 (true) for success, 0 (false) for errors.
+    export "DPI-C" function simutil_large_spsram_set;
+
+    function int simutil_large_spsram_set(input int mem_index, input int addr_index, input bit [7:0] val);
+        if (mem_index > 15 || addr_index >= MEMDEPTH ) begin
+            $display("\t********* Invalid memory index or address *********");
+            return 0;
+        end
+
+        case (mem_index)
+            0: begin
+                ram0.ram_mem[addr_index][7:0] = val;
+            end
+
+            1: begin
+                ram1.ram_mem[addr_index][7:0] = val;
+            end
+
+            2: begin
+                ram2.ram_mem[addr_index][7:0] = val;
+            end
+
+            3: begin
+                ram3.ram_mem[addr_index][7:0] = val;
+            end
+
+            4: begin
+                ram4.ram_mem[addr_index][7:0] = val;
+            end
+
+            5: begin
+                ram5.ram_mem[addr_index][7:0] = val;
+            end
+
+            6: begin
+                ram6.ram_mem[addr_index][7:0] = val;
+            end
+
+            7: begin
+                ram7.ram_mem[addr_index][7:0] = val;
+            end
+
+            8: begin
+                ram8.ram_mem[addr_index][7:0] = val;
+            end
+
+            9: begin
+                ram9.ram_mem[addr_index][7:0] = val;
+            end
+
+            10: begin
+                ram10.ram_mem[addr_index][7:0] = val;
+            end
+
+            11: begin
+                ram11.ram_mem[addr_index][7:0] = val;
+            end
+
+            12: begin
+                ram12.ram_mem[addr_index][7:0] = val;
+            end
+
+            13: begin
+                ram13.ram_mem[addr_index][7:0] = val;
+            end
+
+            14: begin
+                ram14.ram_mem[addr_index][7:0] = val;
+            end
+
+            15: begin
+                ram15.ram_mem[addr_index][7:0] = val;
+            end
+
+            default: begin
+                $display("\t********* Invalid memory index  *********");
+            end
+        endcase
+        return 1;
+    endfunction
+
+
+
+    // Function for getting a specific element in |ram_mem|
+    export "DPI-C" function simutil_large_spsram_get;
+
+    function int simutil_large_spsram_get(input mem_index, input int addr_index, output bit [7:0] val);
+        if (mem_index > 15 || addr_index >= MEMDEPTH ) begin
+            $display("\t********* Invalid memory index or address *********");
+            return 0;
+        end
+
+        case (mem_index)
+            0: begin
+                val = ram0.ram_mem[addr_index][7:0];
+            end
+
+            1: begin
+                val = ram1.ram_mem[addr_index][7:0];
+            end
+
+            2: begin
+                val = ram2.ram_mem[addr_index][7:0];
+            end
+
+            3: begin
+                val = ram3.ram_mem[addr_index][7:0];
+            end
+
+            4: begin
+                val = ram4.ram_mem[addr_index][7:0];
+            end
+
+            5: begin
+                val = ram5.ram_mem[addr_index][7:0];
+            end
+
+            6: begin
+                val = ram6.ram_mem[addr_index][7:0];
+            end
+
+            7: begin
+                val = ram7.ram_mem[addr_index][7:0];
+            end
+
+            8: begin
+                val = ram8.ram_mem[addr_index][7:0];
+            end
+
+            9: begin
+                val = ram9.ram_mem[addr_index][7:0];
+            end
+
+            10: begin
+                val = ram10.ram_mem[addr_index][7:0];
+            end
+
+            11: begin
+                val = ram11.ram_mem[addr_index][7:0];
+            end
+
+            12: begin
+                val = ram12.ram_mem[addr_index][7:0];
+            end
+
+            13: begin
+                val = ram13.ram_mem[addr_index][7:0];
+            end
+
+            14: begin
+                val = ram14.ram_mem[addr_index][7:0];
+            end
+
+            15: begin
+                val = ram15.ram_mem[addr_index][7:0];
+            end
+
+            default: begin
+                $display("\t********* Invalid memory index  *********");
+            end
+        endcase
+
+    endfunction
+
 
 
 endmodule

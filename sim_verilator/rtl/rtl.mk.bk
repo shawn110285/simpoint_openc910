@@ -1,0 +1,374 @@
+## ===============================================================================
+## Purpose:	Builds the rtl project
+## Targets:
+##	all:    build a verilator simulation,include the core and the tb.
+##	clean:	Removes all build products
+##  E-mail:  shawn110285@gmail.com
+## ================================================================================
+
+.PHONY: all
+.DELETE_ON_ERROR:
+
+
+CURR_ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+OPENC910_ROOT_DIR := $(CURR_ROOT_DIR)/../../openc910
+
+C910_RTL_FACTORY_DIR := $(OPENC910_ROOT_DIR)/C910_RTL_FACTORY
+C910_RTL_DIR := $(C910_RTL_FACTORY_DIR)/gen_rtl
+
+# the rtl files of the cpu core
+SRC_BIU_RTL_DIR := $(C910_RTL_DIR)/biu/rtl
+SRC_CIU_RTL_DIR := $(C910_RTL_DIR)/ciu/rtl
+SRC_CLINT_RTL_DIR := $(C910_RTL_DIR)/clint/rtl
+SRC_CLK_RTL_DIR := $(C910_RTL_DIR)/clk/rtl
+SRC_COMMON_RTL_DIR := $(C910_RTL_DIR)/common/rtl
+SRC_CP0_RTL_DIR := $(C910_RTL_DIR)/cp0/rtl
+SRC_CPU_RTL_DIR := $(C910_RTL_DIR)/cpu/rtl
+SRC_FPGA_RTL_DIR := $(C910_RTL_DIR)/fpga/rtl
+SRC_HAD_RTL_DIR := $(C910_RTL_DIR)/had/rtl
+SRC_IDU_RTL_DIR := $(C910_RTL_DIR)/idu/rtl
+SRC_IFU_RTL_DIR := $(C910_RTL_DIR)/ifu/rtl
+SRC_IU_RTL_DIR := $(C910_RTL_DIR)/iu/rtl
+SRC_L2C_RTL_DIR := $(C910_RTL_DIR)/l2c/rtl
+SRC_LSU_RTL_DIR := $(C910_RTL_DIR)/lsu/rtl
+SRC_MMU_RTL_DIR := $(C910_RTL_DIR)/mmu/rtl
+SRC_PLIC_RTL_DIR := $(C910_RTL_DIR)/plic/rtl
+SRC_PMP_RTL_DIR := $(C910_RTL_DIR)/pmp/rtl
+SRC_PMU_RTL_DIR := $(C910_RTL_DIR)/pmu/rtl
+SRC_RST_RTL_DIR := $(C910_RTL_DIR)/rst/rtl
+SRC_RTU_RTL_DIR := $(C910_RTL_DIR)/rtu/rtl
+SRC_VFALU_RTL_DIR := $(C910_RTL_DIR)/vfalu/rtl
+SRC_VFDSU_RTL_DIR := $(C910_RTL_DIR)/vfdsu/rtl
+SRC_VFMAU_RTL_DIR := $(C910_RTL_DIR)/vfmau/rtl
+SRC_VFPU_RTL_DIR := $(C910_RTL_DIR)/vfpu/rtl
+
+
+
+#files in the fpga
+SRC_FPGA_FILES := $(SRC_FPGA_RTL_DIR)/ct_f_spsram_1024x128.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_128x104.v    $(SRC_FPGA_RTL_DIR)/ct_f_spsram_2048x32.v  \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x23.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_32768x128.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x22.v               \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x96.v $(SRC_FPGA_RTL_DIR)/ct_f_spsram_1024x144.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_128x144.v                \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_2048x59.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x52.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_4096x128.v               \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x44.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_64x108.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_1024x32.v                 \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_128x16.v   $(SRC_FPGA_RTL_DIR)/ct_f_spsram_2048x88.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x54.v                \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_4096x144.v   $(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x52.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_65536x128.v            \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_1024x59.v   $(SRC_FPGA_RTL_DIR)/ct_f_spsram_16384x128.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x100.v            \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x59.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_4096x32.v    $(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x54.v               \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_8192x128.v $(SRC_FPGA_RTL_DIR)/ct_f_spsram_1024x64.v   $(SRC_FPGA_RTL_DIR)/ct_f_spsram_2048x128.v             \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x144.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x7.v   $(SRC_FPGA_RTL_DIR)/ct_f_spsram_4096x84.v                \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x59.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_8192x32.v $(SRC_FPGA_RTL_DIR)/ct_f_spsram_1024x92.v                 \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_2048x144.v   $(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x196.v  $(SRC_FPGA_RTL_DIR)/ct_f_spsram_256x84.v              \
+	$(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x144.v    $(SRC_FPGA_RTL_DIR)/ct_f_spsram_512x7.v   $(SRC_FPGA_RTL_DIR)/fpga_ram.v
+
+# files in the dir biu module
+SRC_BIU_FILES := $(SRC_BIU_RTL_DIR)/ct_biu_csr_req_arbiter.v  $(SRC_BIU_RTL_DIR)/ct_biu_lowpower.v  $(SRC_BIU_RTL_DIR)/ct_biu_other_io_sync.v   \
+	$(SRC_BIU_RTL_DIR)/ct_biu_read_channel.v  $(SRC_BIU_RTL_DIR)/ct_biu_req_arbiter.v  \
+	$(SRC_BIU_RTL_DIR)/ct_biu_snoop_channel.v  $(SRC_BIU_RTL_DIR)/ct_biu_top.v  $(SRC_BIU_RTL_DIR)/ct_biu_write_channel.v
+
+# files in the ciu module
+SRC_CIU_FILES := $(SRC_CIU_RTL_DIR)/ct_ciu_apbif.v $(SRC_CIU_RTL_DIR)/ct_ciu_ctcq.v $(SRC_CIU_RTL_DIR)/ct_ciu_regs_kid.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb_dp_sel.v    \
+	$(SRC_CIU_RTL_DIR)/ct_ciu_vb_aw_entry.v  $(SRC_CIU_RTL_DIR)/ct_ebiu_read_channel.v $(SRC_CIU_RTL_DIR)/ct_piu_other_io_dummy.v $(SRC_CIU_RTL_DIR)/ct_piu_top.v  \
+	$(SRC_CIU_RTL_DIR)/ct_ciu_bmbif_kid.v $(SRC_CIU_RTL_DIR)/ct_ciu_ebiuif.v  $(SRC_CIU_RTL_DIR)/ct_ciu_regs.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb_sab_entry.v           \
+	$(SRC_CIU_RTL_DIR)/ct_ciu_vb.v $(SRC_CIU_RTL_DIR)/ct_ebiu_snoop_channel_dummy.v $(SRC_CIU_RTL_DIR)/ct_piu_other_io_sync.v $(SRC_CIU_RTL_DIR)/ct_prio.v         \
+	$(SRC_CIU_RTL_DIR)/ct_ciu_bmbif.v $(SRC_CIU_RTL_DIR)/ct_ciu_l2cif.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb_arb.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb_sab.v                    \
+	$(SRC_CIU_RTL_DIR)/ct_ebiu_cawt_entry.v $(SRC_CIU_RTL_DIR)/ct_ebiu_top.v $(SRC_CIU_RTL_DIR)/ct_piu_other_io.v $(SRC_CIU_RTL_DIR)/ct_ciu_ctcq_reqq_entry.v      \
+	$(SRC_CIU_RTL_DIR)/ct_ciu_ncq_gm.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb_dp_sel_16.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb.v $(SRC_CIU_RTL_DIR)/ct_ebiu_lowpower.v             \
+	$(SRC_CIU_RTL_DIR)/ct_ebiu_write_channel.v $(SRC_CIU_RTL_DIR)/ct_piu_top_dummy_device.v $(SRC_CIU_RTL_DIR)/ct_ciu_ctcq_respq_entry.v                           \
+	$(SRC_CIU_RTL_DIR)/ct_ciu_ncq.v $(SRC_CIU_RTL_DIR)/ct_ciu_snb_dp_sel_8.v $(SRC_CIU_RTL_DIR)/ct_ciu_top.v  $(SRC_CIU_RTL_DIR)/ct_ebiu_ncwt_entry.v              \
+	$(SRC_CIU_RTL_DIR)/ct_fifo.v  $(SRC_CIU_RTL_DIR)/ct_piu_top_dummy.v
+
+
+# files in the clint module
+SRC_CLINT_FILES := $(SRC_CLINT_RTL_DIR)/ct_clint_func.v $(SRC_CLINT_RTL_DIR)/ct_clint_top.v
+
+# files in the clk module
+SRC_CLK_FILES := $(SRC_CLK_RTL_DIR)/ct_clk_top.v $(SRC_CLK_RTL_DIR)/ct_mp_clk_top.v $(SRC_CLK_RTL_DIR)/gated_clk_cell.v
+
+# common
+SRC_COMMON_FILES := $(SRC_COMMON_RTL_DIR)/booth_code.v  $(SRC_COMMON_RTL_DIR)/booth_code_v1.v  $(SRC_COMMON_RTL_DIR)/BUFGCE.v  $(SRC_COMMON_RTL_DIR)/compressor_32.v  \
+	$(SRC_COMMON_RTL_DIR)/compressor_42.v  $(SRC_COMMON_RTL_DIR)/sync_level2level.v  $(SRC_COMMON_RTL_DIR)/sync_level2pulse.v
+
+# cp0
+SRC_CP0_FILES := $(SRC_CP0_RTL_DIR)/ct_cp0_iui.v  $(SRC_CP0_RTL_DIR)/ct_cp0_lpmd.v  $(SRC_CP0_RTL_DIR)/ct_cp0_regs.v  $(SRC_CP0_RTL_DIR)/ct_cp0_top.v
+
+# cpu
+SRC_CPU_FILES := $(SRC_CPU_RTL_DIR)/ct_core.v  $(SRC_CPU_RTL_DIR)/ct_rmu_top_dummy.v  $(SRC_CPU_RTL_DIR)/ct_sysio_kid.v  \
+	$(SRC_CPU_RTL_DIR)/ct_sysio_top.v  $(SRC_CPU_RTL_DIR)/ct_top.v  $(SRC_CPU_RTL_DIR)/mp_top_golden_port.v  \
+	$(SRC_CPU_RTL_DIR)/openC910.v  $(SRC_CPU_RTL_DIR)/top_golden_port.v $(SRC_CPU_RTL_DIR)/cpu_cfig.h
+
+
+# had
+SRC_HAD_FILES := $(SRC_HAD_RTL_DIR)/ct_had_bkpt.v  $(SRC_HAD_RTL_DIR)/ct_had_common_top.v  $(SRC_HAD_RTL_DIR)/ct_had_ddc_ctrl.v  $(SRC_HAD_RTL_DIR)/ct_had_etm.v    \
+	$(SRC_HAD_RTL_DIR)/ct_had_ir.v  $(SRC_HAD_RTL_DIR)/ct_had_private_ir.v  $(SRC_HAD_RTL_DIR)/ct_had_serial.v  $(SRC_HAD_RTL_DIR)/ct_had_trace.v               \
+	$(SRC_HAD_RTL_DIR)/ct_had_common_dbg_info.v  $(SRC_HAD_RTL_DIR)/ct_had_ctrl.v  $(SRC_HAD_RTL_DIR)/ct_had_ddc_dp.v  $(SRC_HAD_RTL_DIR)/ct_had_event.v        \
+	$(SRC_HAD_RTL_DIR)/ct_had_nirv_bkpt.v  $(SRC_HAD_RTL_DIR)/ct_had_private_top.v  $(SRC_HAD_RTL_DIR)/ct_had_sm.v $(SRC_HAD_RTL_DIR)/ct_had_common_regs.v      \
+	$(SRC_HAD_RTL_DIR)/ct_had_dbg_info.v  $(SRC_HAD_RTL_DIR)/ct_had_etm_if.v  $(SRC_HAD_RTL_DIR)/ct_had_io.v $(SRC_HAD_RTL_DIR)/ct_had_pcfifo.v                 \
+	$(SRC_HAD_RTL_DIR)/ct_had_regs.v  $(SRC_HAD_RTL_DIR)/ct_had_sync_3flop.v
+
+# idu
+SRC_IDU_FILES := $(SRC_IDU_RTL_DIR)/ct_idu_dep_reg_entry.v $(SRC_IDU_RTL_DIR)/ct_idu_id_fence.v  $(SRC_IDU_RTL_DIR)/ct_idu_ir_vrt.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_biq_entry.v      \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_sdiq.v $(SRC_IDU_RTL_DIR)/ct_idu_rf_fwd.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe7_decd.v  $(SRC_IDU_RTL_DIR)/ct_idu_top.v                         \
+	$(SRC_IDU_RTL_DIR)/ct_idu_dep_reg_src2_entry.v  $(SRC_IDU_RTL_DIR)/ct_idu_id_split_long.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_aiq0_entry.v                                   \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_biq.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_viq0_entry.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_fwd_vreg.v $(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_eregfile.v         \
+	$(SRC_IDU_RTL_DIR)/ct_idu_dep_vreg_entry.v $(SRC_IDU_RTL_DIR)/ct_idu_id_split_short.v $(SRC_IDU_RTL_DIR)/ct_idu_is_aiq0.v $(SRC_IDU_RTL_DIR)/ct_idu_is_ctrl.v              \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_viq0.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe0_decd.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_fregfile.v                                            \
+	$(SRC_IDU_RTL_DIR)/ct_idu_dep_vreg_srcv2_entry.v $(SRC_IDU_RTL_DIR)/ct_idu_ir_ctrl.v $(SRC_IDU_RTL_DIR)/ct_idu_is_aiq1_entry.v $(SRC_IDU_RTL_DIR)/ct_idu_is_dp.v           \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_viq1_entry.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe1_decd.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_gated_ereg.v                                    \
+	$(SRC_IDU_RTL_DIR)/ct_idu_id_ctrl.v $(SRC_IDU_RTL_DIR)/ct_idu_ir_decd.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_aiq1.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_lsiq_entry.v                    \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_viq1.v   $(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe2_decd.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_gated_preg.v $(SRC_IDU_RTL_DIR)/ct_idu_id_decd_special.v \
+	$(SRC_IDU_RTL_DIR)/ct_idu_ir_dp.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_aiq_lch_rdy_1.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_lsiq.v   $(SRC_IDU_RTL_DIR)/ct_idu_rf_ctrl.v                 \
+	$(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe3_decd.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_gated_vreg.v $(SRC_IDU_RTL_DIR)/ct_idu_id_decd.v $(SRC_IDU_RTL_DIR)/ct_idu_ir_frt.v            \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_aiq_lch_rdy_2.v  $(SRC_IDU_RTL_DIR)/ct_idu_is_pipe_entry.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_dp.v $(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe4_decd.v       \
+	$(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_pregfile.v $(SRC_IDU_RTL_DIR)/ct_idu_id_dp.v $(SRC_IDU_RTL_DIR)/ct_idu_ir_rt.v $(SRC_IDU_RTL_DIR)/ct_idu_is_aiq_lch_rdy_3.v               \
+	$(SRC_IDU_RTL_DIR)/ct_idu_is_sdiq_entry.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_fwd_preg.v  $(SRC_IDU_RTL_DIR)/ct_idu_rf_pipe6_decd.v $(SRC_IDU_RTL_DIR)/ct_idu_rf_prf_vregfile.v
+
+# ifu
+SRC_IFU_FILES := $(SRC_IFU_RTL_DIR)/ct_ifu_addrgen.v  $(SRC_IFU_RTL_DIR)/ct_ifu_debug.v   $(SRC_IFU_RTL_DIR)/ct_ifu_icache_data_array1.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ind_btb_array.v \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_l0_btb.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ras.v  $(SRC_IFU_RTL_DIR)/ct_spsram_128x16.v   $(SRC_IFU_RTL_DIR)/ct_spsram_512x59.v                          \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_bht_pre_array.v   $(SRC_IFU_RTL_DIR)/ct_ifu_decd_normal.v    $(SRC_IFU_RTL_DIR)/ct_ifu_icache_if.v      $(SRC_IFU_RTL_DIR)/ct_ifu_ind_btb.v       \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_l1_refill.v  $(SRC_IFU_RTL_DIR)/ct_ifu_sfp_entry.v $(SRC_IFU_RTL_DIR)/ct_spsram_2048x32_split.v $(SRC_IFU_RTL_DIR)/ct_ifu_bht_sel_array.v         \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_ibctrl.v  $(SRC_IFU_RTL_DIR)/ct_ifu_icache_predecd_array0.v $(SRC_IFU_RTL_DIR)/ct_ifu_ipb.v $(SRC_IFU_RTL_DIR)/ct_ifu_lbuf_entry.v                \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_sfp.v  $(SRC_IFU_RTL_DIR)/ct_spsram_2048x59.v $(SRC_IFU_RTL_DIR)/ct_ifu_bht.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ibdp.v                             \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_icache_predecd_array1.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ipctrl.v  $(SRC_IFU_RTL_DIR)/ct_ifu_lbuf.v   $(SRC_IFU_RTL_DIR)/ct_ifu_top.v             \
+	$(SRC_IFU_RTL_DIR)/ct_spsram_256x23.v $(SRC_IFU_RTL_DIR)/ct_ifu_btb_data_array.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ibuf_entry.v $(SRC_IFU_RTL_DIR)/ct_ifu_icache_tag_array.v \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_ipdecode.v   $(SRC_IFU_RTL_DIR)/ct_ifu_pcfifo_if.v  $(SRC_IFU_RTL_DIR)/ct_ifu_vector.v  $(SRC_IFU_RTL_DIR)/ct_spsram_256x59.v               \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_btb_tag_array.v $(SRC_IFU_RTL_DIR)/ct_ifu_ibuf.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ifctrl.v   $(SRC_IFU_RTL_DIR)/ct_ifu_ipdp.v                     \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_pcgen.v  $(SRC_IFU_RTL_DIR)/ct_spsram_1024x59.v  $(SRC_IFU_RTL_DIR)/ct_spsram_512x22.v $(SRC_IFU_RTL_DIR)/ct_ifu_btb.v                      \
+	$(SRC_IFU_RTL_DIR)/ct_ifu_icache_data_array0.v  $(SRC_IFU_RTL_DIR)/ct_ifu_ifdp.v   $(SRC_IFU_RTL_DIR)/ct_ifu_l0_btb_entry.v $(SRC_IFU_RTL_DIR)/ct_ifu_precode.v       \
+	$(SRC_IFU_RTL_DIR)/ct_spsram_1024x64.v  $(SRC_IFU_RTL_DIR)/ct_spsram_512x44.v
+
+
+# iu
+SRC_IU_FILES := $(SRC_IU_RTL_DIR)/ct_iu_alu.v   $(SRC_IU_RTL_DIR)/ct_iu_bju_pcfifo_read_entry.v $(SRC_IU_RTL_DIR)/ct_iu_bju.v $(SRC_IU_RTL_DIR)/ct_iu_div_entry.v  \
+	$(SRC_IU_RTL_DIR)/ct_iu_div.v  $(SRC_IU_RTL_DIR)/ct_iu_rbus.v $(SRC_IU_RTL_DIR)/ct_iu_top.v $(SRC_IU_RTL_DIR)/ct_iu_bju_pcfifo_entry.v  \
+	$(SRC_IU_RTL_DIR)/ct_iu_bju_pcfifo.v  $(SRC_IU_RTL_DIR)/ct_iu_cbus.v $(SRC_IU_RTL_DIR)/ct_iu_div_srt_radix16.v $(SRC_IU_RTL_DIR)/ct_iu_mult.v  \
+	$(SRC_IU_RTL_DIR)/ct_iu_special.v $(SRC_IU_RTL_DIR)/multiplier_65x65_3_stage.v
+
+
+# l2c
+SRC_L2C_FILES := $(SRC_L2C_RTL_DIR)/ct_l2cache_data_array.v   $(SRC_L2C_RTL_DIR)/ct_l2c_cmp.v   $(SRC_L2C_RTL_DIR)/ct_l2c_sub_bank.v  $(SRC_L2C_RTL_DIR)/ct_l2c_wb.v  \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_128x104.v   $(SRC_L2C_RTL_DIR)/ct_spsram_2048x144.v  $(SRC_L2C_RTL_DIR)/ct_spsram_32768x128.v  $(SRC_L2C_RTL_DIR)/ct_spsram_512x144.v   \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_8192x128.v  $(SRC_L2C_RTL_DIR)/ct_l2cache_dirty_array_16way.v   $(SRC_L2C_RTL_DIR)/ct_l2c_data.v   $(SRC_L2C_RTL_DIR)/ct_l2c_tag_ecc.v  \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_1024x128.v  $(SRC_L2C_RTL_DIR)/ct_spsram_128x144.v   $(SRC_L2C_RTL_DIR)/ct_spsram_2048x88.v  $(SRC_L2C_RTL_DIR)/ct_spsram_4096x128.v    \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_512x96.v  $(SRC_L2C_RTL_DIR)/ct_l2cache_tag_array_16way.v   $(SRC_L2C_RTL_DIR)/ct_l2c_icc.v   $(SRC_L2C_RTL_DIR)/ct_l2c_tag.v           \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_1024x144.v   $(SRC_L2C_RTL_DIR)/ct_spsram_16384x128.v   $(SRC_L2C_RTL_DIR)/ct_spsram_256x100.v    $(SRC_L2C_RTL_DIR)/ct_spsram_4096x144.v  \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_64x108.v  $(SRC_L2C_RTL_DIR)/ct_l2cache_top.v   $(SRC_L2C_RTL_DIR)/ct_l2c_prefetch.v   $(SRC_L2C_RTL_DIR)/ct_l2c_top.v       \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_1024x92.v    $(SRC_L2C_RTL_DIR)/ct_spsram_2048x128.v    $(SRC_L2C_RTL_DIR)/ct_spsram_256x144.v  $(SRC_L2C_RTL_DIR)/ct_spsram_4096x84.v   \
+	$(SRC_L2C_RTL_DIR)/ct_spsram_65536x128.v
+
+# lsu
+SRC_LSU_FILES := $(SRC_LSU_RTL_DIR)/ct_lsu_amr.v  $(SRC_LSU_RTL_DIR)/ct_lsu_dcache_tag_array.v  $(SRC_LSU_RTL_DIR)/ct_lsu_lfb_addr_entry.v  $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_pfb_entry.v           \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_rb.v $(SRC_LSU_RTL_DIR)/ct_lsu_spec_fail_predict.v  $(SRC_LSU_RTL_DIR)/ct_lsu_vb_sdb_data_entry.v  $(SRC_LSU_RTL_DIR)/ct_spsram_256x54.v  $(SRC_LSU_RTL_DIR)/ct_lsu_bus_arb.v    \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_dcache_top.v  $(SRC_LSU_RTL_DIR)/ct_lsu_lfb_data_entry.v  $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_pfb_l1sm.v   $(SRC_LSU_RTL_DIR)/ct_lsu_rot_data.v                     \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_sq_entry.v    $(SRC_LSU_RTL_DIR)/ct_lsu_vb_sdb_data.v      $(SRC_LSU_RTL_DIR)/ct_spsram_256x7.v $(SRC_LSU_RTL_DIR)/ct_lsu_cache_buffer.v                      \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_icc.v         $(SRC_LSU_RTL_DIR)/ct_lsu_lfb.v             $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_pfb_l2sm.v   $(SRC_LSU_RTL_DIR)/ct_lsu_sd_ex1.v                       \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_sq.v          $(SRC_LSU_RTL_DIR)/ct_lsu_vb.v             $(SRC_LSU_RTL_DIR)/ct_spsram_4096x32.v      $(SRC_LSU_RTL_DIR)/ct_lsu_ctrl.v                         \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_idfifo_8.v    $(SRC_LSU_RTL_DIR)/ct_lsu_lm.v             $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_pfb_tsm.v    $(SRC_LSU_RTL_DIR)/ct_lsu_snoop_ctcq_entry.v              \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_st_ag.v       $(SRC_LSU_RTL_DIR)/ct_lsu_wmb_ce.v         $(SRC_LSU_RTL_DIR)/ct_spsram_512x52.v      $(SRC_LSU_RTL_DIR)/ct_lsu_dcache_arb.v                    \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_idfifo_entry.v  $(SRC_LSU_RTL_DIR)/ct_lsu_lq_entry.v $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_pmb_entry.v  $(SRC_LSU_RTL_DIR)/ct_lsu_snoop_ctcq.v                        \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_st_da.v       $(SRC_LSU_RTL_DIR)/ct_lsu_wmb_entry.v   $(SRC_LSU_RTL_DIR)/ct_spsram_512x54.v     $(SRC_LSU_RTL_DIR)/ct_lsu_dcache_data_array.v                 \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_ld_ag.v       $(SRC_LSU_RTL_DIR)/ct_lsu_lq.v          $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_sdb_cmp.v   $(SRC_LSU_RTL_DIR)/ct_lsu_snoop_req_arbiter.v                 \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_st_dc.v       $(SRC_LSU_RTL_DIR)/ct_lsu_wmb.v       $(SRC_LSU_RTL_DIR)/ct_spsram_512x7.v        $(SRC_LSU_RTL_DIR)/ct_lsu_dcache_dirty_array.v                \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_ld_da.v       $(SRC_LSU_RTL_DIR)/ct_lsu_mcic.v      $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_sdb_entry.v  $(SRC_LSU_RTL_DIR)/ct_lsu_snoop_resp.v                         \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_st_wb.v       $(SRC_LSU_RTL_DIR)/ct_spsram_1024x32.v  $(SRC_LSU_RTL_DIR)/ct_spsram_8192x32.v   $(SRC_LSU_RTL_DIR)/ct_lsu_dcache_info_update.v                 \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_ld_dc.v       $(SRC_LSU_RTL_DIR)/ct_lsu_pfu_gpfb.v    $(SRC_LSU_RTL_DIR)/ct_lsu_pfu.v          $(SRC_LSU_RTL_DIR)/ct_lsu_snoop_snq_entry.v                    \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_top.v         $(SRC_LSU_RTL_DIR)/ct_spsram_2048x32.v  $(SRC_LSU_RTL_DIR)/ct_lsu_dcache_ld_tag_array.v  $(SRC_LSU_RTL_DIR)/ct_lsu_ld_wb.v                      \
+	$(SRC_LSU_RTL_DIR)/ct_lsu_pfu_gsdb.v    $(SRC_LSU_RTL_DIR)/ct_lsu_rb_entry.v    $(SRC_LSU_RTL_DIR)/ct_lsu_snoop_snq.v     $(SRC_LSU_RTL_DIR)/ct_lsu_vb_addr_entry.v                     \
+	$(SRC_LSU_RTL_DIR)/ct_spsram_256x52.v
+
+# mmu
+SRC_MMU_FILES := $(SRC_MMU_RTL_DIR)/ct_mmu_arb.v $(SRC_MMU_RTL_DIR)/ct_mmu_dutlb_huge_entry.v $(SRC_MMU_RTL_DIR)/ct_mmu_iplru.v $(SRC_MMU_RTL_DIR)/ct_mmu_iutlb.v  $(SRC_MMU_RTL_DIR)/ct_mmu_jtlb.v  \
+	$(SRC_MMU_RTL_DIR)/ct_mmu_sysmap_hit.v  $(SRC_MMU_RTL_DIR)/ct_mmu_top.v  $(SRC_MMU_RTL_DIR)/sysmap.h  $(SRC_MMU_RTL_DIR)/ct_mmu_dplru.v $(SRC_MMU_RTL_DIR)/ct_mmu_dutlb_read.v               \
+	$(SRC_MMU_RTL_DIR)/ct_mmu_iutlb_entry.v $(SRC_MMU_RTL_DIR)/ct_mmu_jtlb_data_array.v  $(SRC_MMU_RTL_DIR)/ct_mmu_ptw.v   $(SRC_MMU_RTL_DIR)/ct_mmu_sysmap.v  $(SRC_MMU_RTL_DIR)/ct_spsram_256x196.v \
+	$(SRC_MMU_RTL_DIR)/ct_mmu_dutlb_entry.v  $(SRC_MMU_RTL_DIR)/ct_mmu_dutlb.v $(SRC_MMU_RTL_DIR)/ct_mmu_iutlb_fst_entry.v  $(SRC_MMU_RTL_DIR)/ct_mmu_jtlb_tag_array.v                            \
+	$(SRC_MMU_RTL_DIR)/ct_mmu_regs.v  $(SRC_MMU_RTL_DIR)/ct_mmu_tlboper.v    $(SRC_MMU_RTL_DIR)/ct_spsram_256x84.v
+
+# plic
+SRC_PLIC_FILES := $(SRC_PLIC_RTL_DIR)/csky_apb_1tox_matrix.v  $(SRC_PLIC_RTL_DIR)/plic_32to1_arb.v  $(SRC_PLIC_RTL_DIR)/plic_arb_ctrl.v  $(SRC_PLIC_RTL_DIR)/plic_ctrl.v \
+	$(SRC_PLIC_RTL_DIR)/plic_granu2_arb.v $(SRC_PLIC_RTL_DIR)/plic_granu_arb.v  $(SRC_PLIC_RTL_DIR)/plic_hart_arb.v  $(SRC_PLIC_RTL_DIR)/plic_hreg_busif.v           \
+	$(SRC_PLIC_RTL_DIR)/plic_int_kid.v  $(SRC_PLIC_RTL_DIR)/plic_kid_busif.v  $(SRC_PLIC_RTL_DIR)/plic_top.v
+
+# pmp
+SRC_PMP_FILES := $(SRC_PMP_RTL_DIR)/ct_pmp_acc.v $(SRC_PMP_RTL_DIR)/ct_pmp_comp_hit.v $(SRC_PMP_RTL_DIR)/ct_pmp_regs.v $(SRC_PMP_RTL_DIR)/ct_pmp_top.v
+
+# rst
+SRC_RST_FILES := $(SRC_RST_RTL_DIR)/ct_mp_rst_top.v $(SRC_RST_RTL_DIR)/ct_rst_top.v
+
+# rtu
+SRC_RTU_FILES := $(SRC_RTU_RTL_DIR)/ct_rtu_compare_iid.v $(SRC_RTU_RTL_DIR)/ct_rtu_encode_8.v $(SRC_RTU_RTL_DIR)/ct_rtu_expand_64.v \
+	$(SRC_RTU_RTL_DIR)/ct_rtu_pst_ereg_entry.v $(SRC_RTU_RTL_DIR)/ct_rtu_pst_preg.v  $(SRC_RTU_RTL_DIR)/ct_rtu_pst_vreg.v       \
+	$(SRC_RTU_RTL_DIR)/ct_rtu_rob_expt.v $(SRC_RTU_RTL_DIR)/ct_rtu_top.v $(SRC_RTU_RTL_DIR)/ct_rtu_encode_32.v                  \
+	$(SRC_RTU_RTL_DIR)/ct_rtu_encode_96.v $(SRC_RTU_RTL_DIR)/ct_rtu_expand_8.v  $(SRC_RTU_RTL_DIR)/ct_rtu_pst_ereg.v            \
+	$(SRC_RTU_RTL_DIR)/ct_rtu_pst_vreg_dummy.v $(SRC_RTU_RTL_DIR)/ct_rtu_retire.v $(SRC_RTU_RTL_DIR)/ct_rtu_rob_rt.v            \
+	$(SRC_RTU_RTL_DIR)/ct_rtu_encode_64.v $(SRC_RTU_RTL_DIR)/ct_rtu_expand_32.v $(SRC_RTU_RTL_DIR)/ct_rtu_expand_96.v           \
+	$(SRC_RTU_RTL_DIR)/ct_rtu_pst_preg_entry.v  $(SRC_RTU_RTL_DIR)/ct_rtu_pst_vreg_entry.v                                  \
+       	$(SRC_RTU_RTL_DIR)/ct_rtu_rob_entry.v  $(SRC_RTU_RTL_DIR)/ct_rtu_rob.v
+
+# vfalu
+SRC_VFALU_FILES := $(SRC_VFALU_RTL_DIR)/ct_fadd_close_s0_d.v  $(SRC_VFALU_RTL_DIR)/ct_fadd_ctrl.v  $(SRC_VFALU_RTL_DIR)/ct_fadd_onehot_sel_h.v \
+	$(SRC_VFALU_RTL_DIR)/ct_fcnvt_double_dp.v $(SRC_VFALU_RTL_DIR)/ct_fcnvt_htos_sh.v $(SRC_VFALU_RTL_DIR)/ct_fcnvt_stoh_sh.v              \
+	$(SRC_VFALU_RTL_DIR)/ct_fspu_dp.v  $(SRC_VFALU_RTL_DIR)/ct_vfalu_dp_pipe6.v $(SRC_VFALU_RTL_DIR)/ct_fadd_close_s0_h.v                  \
+	$(SRC_VFALU_RTL_DIR)/ct_fadd_double_dp.v  $(SRC_VFALU_RTL_DIR)/ct_fadd_scalar_dp.v $(SRC_VFALU_RTL_DIR)/ct_fcnvt_dtoh_sh.v             \
+	$(SRC_VFALU_RTL_DIR)/ct_fcnvt_itof_sh.v   $(SRC_VFALU_RTL_DIR)/ct_fcnvt_top.v    $(SRC_VFALU_RTL_DIR)/ct_fspu_half.v                   \
+	$(SRC_VFALU_RTL_DIR)/ct_vfalu_dp_pipe7.v  $(SRC_VFALU_RTL_DIR)/ct_fadd_close_s1_d.v  $(SRC_VFALU_RTL_DIR)/ct_fadd_half_dp.v            \
+       	$(SRC_VFALU_RTL_DIR)/ct_fadd_top.v   $(SRC_VFALU_RTL_DIR)/ct_fcnvt_dtos_sh.v  $(SRC_VFALU_RTL_DIR)/ct_fcnvt_scalar_dp.v                \
+	$(SRC_VFALU_RTL_DIR)/ct_fspu_ctrl.v   $(SRC_VFALU_RTL_DIR)/ct_fspu_single.v $(SRC_VFALU_RTL_DIR)/ct_vfalu_top_pipe6.v                  \
+	$(SRC_VFALU_RTL_DIR)/ct_fadd_close_s1_h.v  $(SRC_VFALU_RTL_DIR)/ct_fadd_onehot_sel_d.v  $(SRC_VFALU_RTL_DIR)/ct_fcnvt_ctrl.v           \
+	$(SRC_VFALU_RTL_DIR)/ct_fcnvt_ftoi_sh.v $(SRC_VFALU_RTL_DIR)/ct_fcnvt_stod_sh.v    $(SRC_VFALU_RTL_DIR)/ct_fspu_double.v               \
+	$(SRC_VFALU_RTL_DIR)/ct_fspu_top.v  $(SRC_VFALU_RTL_DIR)/ct_vfalu_top_pipe7.v
+
+
+# vfdsu
+SRC_VFDSU_FILES := $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_ctrl.v $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_ff1.v  $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_prepare.v           \
+	$(SRC_VFDSU_RTL_DIR)/ct_vfdsu_scalar_dp.v  $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_srt_radix16_only_div.v   $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_srt.v  \
+	$(SRC_VFDSU_RTL_DIR)/ct_vfdsu_double.v $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_pack.v $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_round.v                      \
+	$(SRC_VFDSU_RTL_DIR)/ct_vfdsu_srt_radix16_bound_table.v  $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_srt_radix16_with_sqrt.v  $(SRC_VFDSU_RTL_DIR)/ct_vfdsu_top.v
+
+# vfmau
+SRC_VFMAU_FILES := $(SRC_VFMAU_RTL_DIR)/ct_vfmau_ctrl.v $(SRC_VFMAU_RTL_DIR)/ct_vfmau_ff1_10bit.v  $(SRC_VFMAU_RTL_DIR)/ct_vfmau_lza_42.v  $(SRC_VFMAU_RTL_DIR)/ct_vfmau_lza.v  \
+	$(SRC_VFMAU_RTL_DIR)/ct_vfmau_mult_compressor.v  $(SRC_VFMAU_RTL_DIR)/ct_vfmau_top.v $(SRC_VFMAU_RTL_DIR)/ct_vfmau_dp.v  $(SRC_VFMAU_RTL_DIR)/ct_vfmau_lza_32.v \
+	$(SRC_VFMAU_RTL_DIR)/ct_vfmau_lza_simd_half.v  $(SRC_VFMAU_RTL_DIR)/ct_vfmau_mult1.v  $(SRC_VFMAU_RTL_DIR)/ct_vfmau_mult_simd_half.v
+
+# vfpu
+SRC_VFPU_FILES := $(SRC_VFPU_RTL_DIR)/ct_vfpu_cbus.v $(SRC_VFPU_RTL_DIR)/ct_vfpu_ctrl.v $(SRC_VFPU_RTL_DIR)/ct_vfpu_dp.v $(SRC_VFPU_RTL_DIR)/ct_vfpu_rbus.v $(SRC_VFPU_RTL_DIR)/ct_vfpu_top.v
+
+TILE_FILES := $(SRC_BIU_FILES)    \
+	$(SRC_CIU_FILES)    \
+	$(SRC_CLINT_FILES)  \
+	$(SRC_CLK_FILES)    \
+	$(SRC_COMMON_FILES) \
+	$(SRC_CP0_FILES)    \
+	$(SRC_CPU_FILES)    \
+	$(SRC_HAD_FILES)    \
+	$(SRC_IDU_FILES)    \
+	$(SRC_IFU_FILES)    \
+	$(SRC_IU_FILES)     \
+	$(SRC_L2C_FILES)    \
+	$(SRC_LSU_FILES)    \
+	$(SRC_MMU_FILES)    \
+	$(SRC_PLIC_FILES)   \
+	$(SRC_PMP_FILES)    \
+	$(SRC_PMU_FILES)    \
+	$(SRC_RST_FILES)    \
+	$(SRC_RTU_FILES)    \
+	$(SRC_VFALU_FILES)  \
+	$(SRC_VFDSU_FILES)  \
+	$(SRC_VFMAU_FILES)  \
+	$(SRC_VFPU_FILES)   \
+	$(SRC_FPGA_FILES)
+
+#===============================SOC Testbench Files ========================================
+SMART_RUN_DIR := $(OPENC910_ROOT_DIR)/smart_run
+LOGICAL_DIR := $(SMART_RUN_DIR)/logical
+
+SOC_AHB_RTL_DIR := $(LOGICAL_DIR)/ahb
+SOC_APB_RTL_DIR := $(LOGICAL_DIR)/apb
+SOC_AXI_RTL_DIR := $(LOGICAL_DIR)/axi
+SOC_COMMON_RTL_DIR := $(LOGICAL_DIR)/common
+SOC_GPIO_RTL_DIR := $(LOGICAL_DIR)/gpio
+SOC_MEM_RTL_DIR := $(LOGICAL_DIR)/mem
+SOC_PMU_RTL_DIR := $(LOGICAL_DIR)/pmu
+SOC_UART_RTL_DIR := $(LOGICAL_DIR)/uart
+SOC_TB_RTL_DIR := $(LOGICAL_DIR)/tb
+
+#ahb
+SOC_AHB_FILES := $(SOC_AHB_RTL_DIR)/ahb2apb.v $(SOC_AHB_RTL_DIR)/ahb.v
+
+#apb
+SOC_APB_FILES := $(SOC_APB_RTL_DIR)/apb_bridge.v  $(SOC_APB_RTL_DIR)/apb.v
+
+#axi
+SOC_AXI_FILES := $(SOC_AXI_RTL_DIR)/axi2ahb.v  $(SOC_AXI_RTL_DIR)/axi_err128.v  $(SOC_AXI_RTL_DIR)/axi_fifo_entry.v  \
+	$(SOC_AXI_RTL_DIR)/axi_fifo.v  $(SOC_AXI_RTL_DIR)/axi_interconnect128.v  $(SOC_AXI_RTL_DIR)/axi_slave128.v
+
+#common
+# $(SOC_COMMON_RTL_DIR)/BUFGCE.v
+SOC_COMMON_FILES :=  $(SOC_COMMON_RTL_DIR)/clk_gen.v  $(SOC_COMMON_RTL_DIR)/cpu_sub_system_axi.v  \
+	$(SOC_COMMON_RTL_DIR)/err_gen.v  $(SOC_COMMON_RTL_DIR)/fifo_counter.v  $(SOC_COMMON_RTL_DIR)/fpga_clk_gen.v              \
+	$(SOC_COMMON_RTL_DIR)/rv_integration_platform.v  $(SOC_COMMON_RTL_DIR)/soc.v  $(SOC_COMMON_RTL_DIR)/timer.v              \
+	$(SOC_COMMON_RTL_DIR)/wid_entry.v  $(SOC_COMMON_RTL_DIR)/wid_for_axi4.v
+
+#gpio
+SOC_GPIO_FILES := $(SOC_GPIO_RTL_DIR)/gpio_apbif.v  $(SOC_GPIO_RTL_DIR)/gpio_ctrl.v $(SOC_GPIO_RTL_DIR)/gpio.v
+
+#mem
+SOC_MEM_FILES := $(SOC_MEM_RTL_DIR)/f_spsram_32768x128.v  $(SOC_MEM_RTL_DIR)/f_spsram_large.v  $(SOC_MEM_RTL_DIR)/mem_ctrl.v  $(SOC_MEM_RTL_DIR)/ram.v
+
+#pmu
+SOC_PMU_FILES := $(SOC_PMU_RTL_DIR)/pmu.v  $(SOC_PMU_RTL_DIR)/px_had_sync.v  $(SOC_PMU_RTL_DIR)/sync.v  $(SOC_PMU_RTL_DIR)/tap2_sm.v $(SOC_PMU_RTL_DIR)/ct_hpcp_top.v
+
+#uart
+SOC_UART_FILES := $(SOC_UART_RTL_DIR)/uart_apb_reg.v  $(SOC_UART_RTL_DIR)/uart_baud_gen.v  $(SOC_UART_RTL_DIR)/uart_ctrl.v  \
+	$(SOC_UART_RTL_DIR)/uart_receive.v  $(SOC_UART_RTL_DIR)/uart_trans.v  $(SOC_UART_RTL_DIR)/uart.v
+
+#tb
+SOC_TB_FILES := $(SOC_TB_RTL_DIR)/int_mnt.v $(SOC_TB_RTL_DIR)/tb.v
+
+
+SOC_FILES := $(SOC_AHB_FILES) \
+	$(SOC_APB_FILES)     \
+	$(SOC_AXI_FILES)     \
+	$(SOC_COMMON_FILES)  \
+	$(SOC_GPIO_FILES)    \
+	$(SOC_MEM_FILES)     \
+	$(SOC_PMU_FILES)     \
+	$(SOC_UART_FILES)
+#	$SOC_TB_FILES)
+
+TOP_MOD := soc
+
+VERILOG_FILES := $(TILE_FILES) \
+	$(SOC_FILES)
+
+
+VERILOG_OBJ_DIR := ./obj_dir
+
+VERILATOR = verilator
+
+#-Wall                      Enable all style warnings
+#-Wno-style                 Disable all style warnings
+#-Werror-<message>          Convert warnings to errors
+#-Wno-lint                  Disable all lint warnings
+#-Wno-<message>             Disable warning
+#-I<dir>                    Directory to search for includes
+#-D<macro>
+
+# VFLAGS := --cc -trace -Wall
+VFLAGS := --cc -trace -Wno-style -Wno-lint -Wno-IMPLICIT -Wno-WIDTH -Wno-CASEINCOMPLETE -Wno-WIDTHCONCAT -Wno-UNOPTFLAT -Wno-UNSIGNED  -Wno-MULTIDRIVEN -Wno-COMBDLY #-I$(TB_DIR)
+
+INC_DIR :=$(SRC_CPU_RTL_DIR)
+
+## Find the directory containing the Verilog sources.  This is given from
+## calling: "verilator -V" and finding the VERILATOR_ROOT output line from
+## within it.  From this VERILATOR_ROOT value, we can find all the components
+## we need here--in particular, the verilator include directory
+VERILATOR_ROOT ?= $(shell bash -c '$(VERILATOR) -V|grep VERILATOR_ROOT | head -1 | sed -e "s/^.*=\s*//"')
+
+## The directory containing the verilator includes
+VINC = $(VERILATOR_ROOT)/include
+VINC1 = $(VERILATOR_ROOT)/include/vltstd
+
+$(VERILOG_OBJ_DIR):
+	mkdir $@
+
+# covert the verilog file into the cpp file
+$(VERILOG_OBJ_DIR)/V$(TOP_MOD).cpp: $(VERILOG_FILES)
+	@echo "===================compile RTL into cpp files, start=========================="
+	$(VERILATOR) $(VFLAGS) -I$(INC_DIR) --top-module $(TOP_MOD) $(VERILOG_FILES) V$(TOP_MOD).cpp
+	@echo "===================compile RTL into cpp files, end ==========================="
+
+# create the c++ lib from the above cpp file
+$(VERILOG_OBJ_DIR)/V$(TOP_MOD)__ALL.a: $(VERILOG_OBJ_DIR)/V$(TOP_MOD).cpp
+	@echo "===============add rtl object files into cpp files, start======================"
+#	make --no-print-directory -C $(VERILOG_OBJ_DIR) -f V$(TOP_MOD).mk
+	make -C $(VERILOG_OBJ_DIR) -f V$(TOP_MOD).mk
+	@echo "===============add rtl object files into cpp files, end======================"
+
+all: $(VERILOG_OBJ_DIR)/V$(TOP_MOD)__ALL.a $(VERILOG_OBJ_DIR)
+
+.PHONY: clean
+clean:
+	@echo "=========================cleaning RTL objects, start============================"
+	rm -rf ./$(VERILOG_OBJ_DIR)/
+	@echo "=========================cleaning RTL objects, end============================"
+

@@ -3,7 +3,6 @@
 # File:    simple_system.v
 # Author:  shawn Liu
 # E-mail:  shawn110285@gmail.com
-# Description: a simple soc based on the CPU core
 # --------------------------------------------------------------------------
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -556,15 +555,14 @@ SOC_FILES := \
 	$(LOGICAL_BASE_PATH)/uart/uart_ctrl.v                        \
 	$(LOGICAL_BASE_PATH)/uart/uart_receive.v                     \
 	$(LOGICAL_BASE_PATH)/uart/uart_trans.v                       \
-	$(LOGICAL_BASE_PATH)/uart/uart.v
-
-#	$(LOGICAL_BASE_PATH)/tb/int_mnt.v
+	$(LOGICAL_BASE_PATH)/uart/uart.v                             \
+	$(LOGICAL_BASE_PATH)/tb/tb_verilator.v                       \
+	$(LOGICAL_BASE_PATH)/tb/int_mnt.v
 #	$(LOGICAL_BASE_PATH)/tb/tb.v
-#	$(LOGICAL_BASE_PATH)/tb/tb_verilator.v
 #   $(LOGICAL_BASE_PATH)/common/BUFGCE.v
 
-
-TOP_MOD := soc
+# for verilator_tb, it should change to top, otherwise it should be soc
+TOP_MOD := top
 
 VERILOG_FILES := $(CPU_TILE_FILES) \
 	$(SOC_FILES)
