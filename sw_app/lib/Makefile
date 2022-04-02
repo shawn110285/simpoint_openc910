@@ -75,7 +75,11 @@ ${FILE}.bin: ${FILE}.elf
 	$(OBJCOPY) -O binary $^ $@
 
 ${FILE}.vmem: ${FILE}.bin
-	srec_cat $^ -binary -offset 0x0000 -byte-swap 4 -o $@ -vmem
+	srec_cat $^ -binary -offset 0x0000 -o $@ -vmem
+
+# swap the bytes to big endian
+#	srec_cat $^ -binary -offset 0x0000 -byte-swap 4 -o $@ -vmem
+
 
 ${FILE}.dump: ${FILE}.elf
 	$(OBJDUMP) --disassemble-all $< > $@

@@ -171,10 +171,6 @@ end
 assign addr[ADDR_WIDTH-1:0] = CEN ? addr_holding[ADDR_WIDTH-1:0]
                                   : A[ADDR_WIDTH-1:0];
 
-
-
-
-
 assign Q[WRAP_WIDTH-1:0]               = ram0_dout[WRAP_WIDTH-1:0];
 assign Q[2*WRAP_WIDTH-1:WRAP_WIDTH]    = ram1_dout[WRAP_WIDTH-1:0];
 assign Q[3*WRAP_WIDTH-1:2*WRAP_WIDTH]  = ram2_dout[WRAP_WIDTH-1:0];
@@ -308,12 +304,9 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
 
 
     // Task for loading 'mem' with SystemVerilog system task $readmemh()
-    export "DPI-C" task simutil_large_spsram_load;
+    export "DPI-C" task simutil_load_inst_data;
 
-    task simutil_large_spsram_load;
-        input string file1;
-        input string file2;
-
+    task simutil_load_inst_data(input string file1, input string file2);
         integer i;
         integer j;
 
@@ -375,11 +368,76 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
 
     endtask
 
+    export "DPI-C" task simutil_load_inst;
+    task simutil_load_inst(input string file);
+        integer i;
+        integer j;
+        bit [31:0] mem_inst_temp [65536];
+        $readmemh(file, mem_inst_temp);
+        $display("\t*********spram:Load instruction segment (%s) into memory *********", file);
+        j=0;
+        for(i=0;i<32'h4000;i=j/4) begin
+            ram0.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram1.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram2.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram3.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+            ram4.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram5.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram6.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram7.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+            ram8.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram9.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram10.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram11.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+            ram12.mem[i][7:0] = mem_inst_temp[j][31:24];
+            ram13.mem[i][7:0] = mem_inst_temp[j][23:16];
+            ram14.mem[i][7:0] = mem_inst_temp[j][15: 8];
+            ram15.mem[i][7:0] = mem_inst_temp[j][ 7: 0];
+            j = j+1;
+        end
+    endtask
+
+    export "DPI-C" task simutil_load_data;
+    task simutil_load_data(input string file);
+        integer i;
+        integer j;
+        bit [31:0] mem_data_temp [65536];
+        $readmemh(file, mem_data_temp);
+        $display("\t*********spram:Load data segment (%s) into memory *********", file);
+        j=0;
+        for(i=0;i<32'h4000;i=j/4) begin
+            ram0.mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram1.mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram2.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram3.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram4.mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram5.mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram6.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram7.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram8.mem[i+32'h4000][7:0]   = mem_data_temp[j][31:24];
+            ram9.mem[i+32'h4000][7:0]   = mem_data_temp[j][23:16];
+            ram10.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram11.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+            ram12.mem[i+32'h4000][7:0]  = mem_data_temp[j][31:24];
+            ram13.mem[i+32'h4000][7:0]  = mem_data_temp[j][23:16];
+            ram14.mem[i+32'h4000][7:0]  = mem_data_temp[j][15: 8];
+            ram15.mem[i+32'h4000][7:0]  = mem_data_temp[j][ 7: 0];
+            j = j+1;
+        end
+
+    endtask
+
+
     // Function for setting a specific element in |mem|
     // Returns 1 (true) for success, 0 (false) for errors.
-    export "DPI-C" function simutil_large_spsram_set;
-
-    function int simutil_large_spsram_set(input int mem_index, input int addr_index, input bit [7:0] val);
+    export "DPI-C" function simutil_write_memory;
+    function int simutil_write_memory(input int mem_index, input int addr_index, input byte val);
         if (mem_index > 15 || addr_index >= MEMDEPTH ) begin
             $display("\t********* Invalid memory index or address *********");
             return 0;
@@ -460,9 +518,9 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
 
 
     // Function for getting a specific element in |mem|
-    export "DPI-C" function simutil_large_spsram_get;
+    export "DPI-C" function simutil_read_memory;
 
-    function int simutil_large_spsram_get(input mem_index, input int addr_index, output bit [7:0] val);
+    function int simutil_read_memory(input int mem_index, input int addr_index, output byte val);
         if (mem_index > 15 || addr_index >= MEMDEPTH ) begin
             $display("\t********* Invalid memory index or address *********");
             return 0;
@@ -539,8 +597,6 @@ ram #(WRAP_WIDTH,ADDR_WIDTH) ram15(
         endcase
 
     endfunction
-
-
 
 endmodule
 

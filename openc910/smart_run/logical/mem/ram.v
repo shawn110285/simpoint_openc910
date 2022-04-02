@@ -33,39 +33,4 @@ module ram #(parameter  DATAWIDTH = 2, parameter  ADDRWIDTH = 2)
         end
     end
 
-
-    // Task for loading 'mem' with SystemVerilog system task $readmemh()
-    export "DPI-C" task simutil_ramload;
-
-    task simutil_ramload;
-        input string file;
-        $readmemh(file, mem);
-    endtask
-
-    // Function for setting a specific element in |mem|
-    // Returns 1 (true) for success, 0 (false) for errors.
-    export "DPI-C" function simutil_set_ram;
-
-    function int simutil_set_ram(input int index, input bit [7:0] val);
-        if (index >= MEMDEPTH) begin
-            return 0;
-        end
-        mem[index] = val;
-        return 1;
-    endfunction
-
-    // Function for getting a specific element in |mem|
-    export "DPI-C" function simutil_get_ram;
-
-    function int simutil_get_ram(input int index, output bit [7:0] val);
-        if (index >= MEMDEPTH) begin
-          return 0;
-        end
-
-        val = 0;
-        val = mem[index];
-        return 1;
-    endfunction
-
-
 endmodule

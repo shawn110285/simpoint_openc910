@@ -742,6 +742,64 @@ err_gen  x_err_gen (
   .pll_core_cpuclk (per_clk        )
 );
 
+
+`define CPU_TOP             x_cpu_sub_system_axi.x_rv_integration_platform.x_cpu_top
+`define clk_en              `CPU_TOP.axim_clk_en
+
+    reg [31:0] cpu_awaddr;
+    reg [3:0]  cpu_awlen;
+    reg [15:0] cpu_wstrb;
+    reg        cpu_wvalid;
+    reg [63:0] value0;
+    reg [63:0] value1;
+    reg [63:0] value2;
+
+    static integer FILE;
+
+    always @(posedge i_pad_clk) begin
+        cpu_awlen[3:0]   <=  x_axi_slave128.awlen[3:0];
+        cpu_awaddr[31:0] <=  x_axi_slave128.mem_addr[31:0];
+        cpu_wvalid       <=  biu_pad_wvalid;
+        cpu_wstrb        <=  biu_pad_wstrb;
+
+        value0           <= `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.rbus_pipe0_wb_data[63:0];
+        value1           <= `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_iu_top.x_ct_iu_rbus.rbus_pipe1_wb_data[63:0];
+        value2           <= `CPU_TOP.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_ld_wb.ld_wb_preg_data_sign_extend[63:0];
+    end
+
+    always @(posedge i_pad_clk) begin
+        if(value0 == 64'h444333222 || value1 == 64'h444333222 || value2 == 64'h444333222) begin
+            $display("**********************************************");
+            $display("*    simulation finished successfully        *");
+            $display("**********************************************");
+            //#10;
+            FILE = $fopen("run_case.report","w");
+            $fwrite(FILE,"TEST PASS");
+
+            $finish;
+            end else if (value0 == 64'h2382348720 || value1 == 64'h2382348720 || value2 == 64'h444333222) begin
+            $display("**********************************************");
+            $display("*    simulation finished with error          *");
+            $display("**********************************************");
+            //#10;
+            FILE = $fopen("run_case.report","w");
+            $fwrite(FILE,"TEST FAIL");
+
+            $finish;
+        end else if((cpu_awlen[3:0] == 4'b0) && (cpu_awaddr[31:0] == 32'h01ff_fff0) && cpu_wvalid && `clk_en) begin
+            if(cpu_wstrb[15:0] == 16'hf) begin
+                $write("%c",  biu_pad_wdata[7:0]);
+            end else if(cpu_wstrb[15:0] == 16'hf0) begin
+                $write("%c",  biu_pad_wdata[39:32]);
+            end else if(cpu_wstrb[15:0] == 16'hf00) begin
+                $write("%c",  biu_pad_wdata[71:64]);
+            end else if(cpu_wstrb[15:0] == 16'hf000) begin
+                $write("%c",  biu_pad_wdata[103:96]);
+            end
+        end
+    end
+
+
 endmodule
 
 

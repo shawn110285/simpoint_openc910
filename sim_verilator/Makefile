@@ -30,16 +30,16 @@ MAKE   = make
 # the rm comand
 RM = rm -rf
 
-LOCAL_LIBS := ./sim/obj_dir/libtb.a ./rtl/obj_dir/Vtop__ALL.a
+LOCAL_LIBS := ./sim/obj_dir/libtb.a ./rtl/obj_dir/Vsoc__ALL.a
 
 # the bin file name
 target = openc910_tb
 
 # the dependant libs
-rtl/obj_dir/Vtop__ALL.a:
+rtl/obj_dir/Vsoc__ALL.a:
 	$(MAKE) -C ./rtl -f rtl.mk all
 
-sim/obj_dir/libtb.a: ./rtl/obj_dir/Vtop__ALL.a
+sim/obj_dir/libtb.a: ./rtl/obj_dir/Vsoc__ALL.a
 	$(MAKE) -C ./sim -f sim.mk all
 
 # All Target
